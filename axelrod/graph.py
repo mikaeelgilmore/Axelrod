@@ -51,7 +51,8 @@ class Graph(object):
         """
         Add all loops to edges
         """
-        self.add_edges((i, i) for i, _ in enumerate(self.vertices()))
+        # self.add_edges((i, i) for i, _ in enumerate(self.vertices()))
+        self.add_edges((x, x) for x in self.vertices())
 
     def edges(self):
         return self._edges
@@ -107,7 +108,7 @@ def cycle(length, directed=False):
     return graph
 
 
-def complete_graph(length, loops=True):
+def complete_graph(length, directed=False, loops=True):
     """
     Produces a complete graph of size `length`, with loops.
     https://en.wikipedia.org/wiki/Complete_graph
@@ -118,15 +119,37 @@ def complete_graph(length, loops=True):
         Number of vertices in the cycle
     directed: bool, False
         Is the graph directed?
+    loops: bool, True
+        attach loops at each node?
     Returns
     -------
     a Graph object
     """
-    graph = Graph(directed=False)
+    graph = Graph(directed=directed)
     edges = []
     for i in range(length):
         for j in range(i + 1, length):
             edges.append((i, j))
+    graph.add_edges(edges)
+
+    if loops:
+        graph.add_loops()
+
+    return graph
+
+
+def attached_complete_graphs(length, directed=False, loops=True):
+    graph = Graph(directed=directed)
+    edges = []
+    # Two complete graphs
+    for cluster in range(2):
+        for i in range(length):
+            for j in range(i + 1, length):
+                edges.append(("{}:{}".format(cluster, i),
+                              "{}:{}".format(cluster, j)))
+    # Attach at one node
+    edges.append(("0:0", "1:0"))
+
     graph.add_edges(edges)
 
     if loops:
